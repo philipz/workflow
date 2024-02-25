@@ -20,11 +20,19 @@ services:
       retries: 5
 
   camunda:
-    image: philipz/workflow-backend:7.20
+    image: philipz/workflow-backend:7.20-redis
     ports:
       - 8080:8080
     depends_on:
       - postgresql
+      - redis-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/camunda
+      - OTEL_JAVAAGENT_ENABLED=true
+      - OTEL_TRACES_EXPORTER=zipkin
+      - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_SERVICE_NAME=camunda
 
   frontedn:
     image: philipz/workflow-frontend:20-alpine
@@ -32,6 +40,16 @@ services:
       - 3000:3000
     depends_on:
       - camunda
+
+  redis-service:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+
+  zipkin:
+    image: openzipkin/zipkin-slim:latest
+    ports:
+      - "9411:9411"
 
 volumes:
   workflow-postgresql-data:
