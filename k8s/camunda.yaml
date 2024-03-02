@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: camunda-deployment
-  namespace: camunda
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -16,13 +16,41 @@ spec:
       containers:
         - name: camunda
           image: philipz/workflow-backend:7.20-redis
-
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 12
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 1Gi
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgresql:5432/camunda
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: admin
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: camunda-service
-  namespace: camunda
+  namespace: default
 spec:
   selector:
     app: camunda

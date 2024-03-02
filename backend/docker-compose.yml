@@ -20,12 +20,20 @@ services:
       retries: 5
 
   camunda:
-    image: philipz/workflow-backend:7.20-redis
+    image: backend:1.0.0-SNAPSHOT
     ports:
       - 8080:8080
     depends_on:
       - postgresql
       - redis-service
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+        reservations:
+          cpus: '0.5'
+          memory: 500M
 
   redis-service:
     image: redis:7-alpine

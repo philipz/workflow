@@ -11,3 +11,9 @@ spring.datasource:
 spring.data.redis:
   host: redis-service
   port: 6379
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
