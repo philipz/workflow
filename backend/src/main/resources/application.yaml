@@ -1,6 +1,7 @@
 camunda.bpm.admin-user:
   id: admin
   password: admin
+  default-serialization-format: application/json
 #server.servlet.context-path: /operate
 spring.datasource:
   url: jdbc:postgresql://postgresql:5432/camunda
